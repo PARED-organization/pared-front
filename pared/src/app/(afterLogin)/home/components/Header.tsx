@@ -20,13 +20,8 @@ export default function Header() {
           <span>Q&A</span>
         </nav>
       </div>
+
       <div className="flex items-center gap-[20px]">
-        <Image
-          src="/images/main/alarm.svg"
-          alt="Notification"
-          width={58}
-          height={58}
-        />
         <span className="relative">
           <Image
             src="/images/main/profile.svg"
@@ -36,6 +31,12 @@ export default function Header() {
             className="rounded-b-[5px]"
           />
         </span>
+        <Image
+          src="/images/main/alarm.svg"
+          alt="Notification"
+          width={58}
+          height={58}
+        />
       </div>
     </header>
   );

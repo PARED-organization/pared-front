@@ -3,45 +3,96 @@
 import Header from "./components/Header";
 import BannerSlider from "./components/BannerSlider";
 import NoticeBoard from "./components/NoticeBoard";
-import PostSlider from "./components/PostSlider";
+import PostGrid from "./components/Post";
 
-const posts = [
-  {
-    author: "김가나",
-    question: "말이 느린 아이를 도와주는 방법은?",
-    detail:
-      "아이가 또래보다 말을 잘하지 못하는 편인데 어떻게 도와줄 수 있을까요?",
-    comments: 2,
-    views: 15,
-    likes: 4,
-  },
-  {
-    author: "이하나",
-    question: "아이 집중력 향상 방법은?",
-    detail: "놀이 중 집중을 잘 못하는데 어떻게 하면 좋아질까요?",
-    comments: 1,
-    views: 8,
-    likes: 2,
-  },
-  {
-    author: "박다정",
-    question: "분리불안 어떻게 극복하나요?",
-    detail: "엄마 떨어지면 많이 울어요…",
-    comments: 3,
-    views: 10,
-    likes: 3,
-  },
-];
+const boards = {
+  자유게시판: [
+    {
+      author: "김가나",
+      question: "말이 느린 아이를 도와주는 방법은?",
+      detail:
+        "아이가 또래보다 말을 잘하지 못하는 편인데 어떻게 도와줄 수 있을까요?",
+      comments: 2,
+      views: 15,
+      likes: 4,
+    },
+    {
+      author: "김가나",
+      question: "말이 느린 아이를 도와주는 방법은?",
+      detail:
+        "아이가 또래보다 말을 잘하지 못하는 편인데 어떻게 도와줄 수 있을까요?",
+      comments: 2,
+      views: 15,
+      likes: 4,
+    },
+    {
+      author: "김가나",
+      question: "말이 느린 아이를 도와주는 방법은?",
+      detail:
+        "아이가 또래보다 말을 잘하지 못하는 편인데 어떻게 도와줄 수 있을까요?",
+      comments: 2,
+      views: 15,
+      likes: 4,
+    },
+    {
+      author: "김가나",
+      question: "말이 느린 아이를 도와주는 방법은?",
+      detail:
+        "아이가 또래보다 말을 잘하지 못하는 편인데 어떻게 도와줄 수 있을까요?",
+      comments: 2,
+      views: 15,
+      likes: 4,
+    },
+    {
+      author: "김가나",
+      question: "말이 느린 아이를 도와주는 방법은?",
+      detail:
+        "아이가 또래보다 말을 잘하지 못하는 편인데 어떻게 도와줄 수 있을까요?",
+      comments: 2,
+      views: 15,
+      likes: 4,
+    },
+    {
+      author: "김가나",
+      question: "말이 느린 아이를 도와주는 방법은?",
+      detail:
+        "아이가 또래보다 말을 잘하지 못하는 편인데 어떻게 도와줄 수 있을까요?",
+      comments: 2,
+      views: 15,
+      likes: 4,
+    },
+    // 자유게시판 게시글 추가 가능
+  ],
+  정보게시판: [
+    {
+      author: "박철수",
+      question: "좋은 육아 정보를 공유해 주세요.",
+      detail: "육아에 도움되는 좋은 정보가 있으면 알려주세요.",
+      comments: 1,
+      views: 10,
+      likes: 3,
+    },
+  ],
+  QnA: [
+    {
+      author: "이영희",
+      question: "아이가 밤에 잠을 잘 자게 하는 방법은?",
+      detail: "밤에 아이가 자주 깨는데 어떻게 해야 할까요?",
+      comments: 3,
+      views: 20,
+      likes: 5,
+    },
+  ],
+};
 
 export default function HomePage() {
   return (
     <main className="w-full min-h-screen bg-white bg-[url('/images/common/gradient_bg.png')] bg-cover bg-center flex flex-col items-center">
       <Header />
       <BannerSlider />
-      <section className="w-full flex justify-center gap-[76px] px-[210px]">
+      <section className="w-full flex gap-[39px] px-[70px]">
         <NoticeBoard />
-        <PostSlider title="자유게시판" posts={posts} />
-        <PostSlider title="Q&A" posts={posts} />
+        <PostGrid boards={boards} />
       </section>
     </main>
   );
