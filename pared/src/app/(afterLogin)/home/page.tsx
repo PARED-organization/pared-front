@@ -80,7 +80,7 @@ const boards = {
       detail: "밤에 아이가 자주 깨는데 어떻게 해야 할까요?",
       comments: 3,
       views: 20,
-      likes: 5,
+      likes: 10,
     },
   ],
 };
