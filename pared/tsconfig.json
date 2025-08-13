@@ -5,6 +5,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "noImplicitAny": false, // 이 부분을 추가하세요
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
