@@ -34,7 +34,7 @@ export default function SocialLogin() {
           KAKAO 계정으로 회원가입
         </button>
 
-        <button className="relative w-[420px] h-[44px] bg-[#5BC55F] text-[#fff] rounded-[4px] flex items-center justify-center cursor-pointer">
+        <button className="relative w-[420px] h-[44px] bg-[#5BC55F] text-[#fff] rounded-[4px] flex items-center justify-center cursor-pointer mb-[24px]">
           <div className="absolute left-[90px]">
             <Image
               src="/images/Auth/naver_icon.svg"
