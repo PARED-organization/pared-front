@@ -1,7 +1,9 @@
+
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-
+import ParedModal from "./(beforeLogin)/login/_component/ParedModal";
 const pretendard = localFont({
   src: [
     {
@@ -41,7 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={pretendard.variable}>
-      <body>{children}</body>
+      <body>                
+        {children}
+      </body>
+      
     </html>
   );
 }
