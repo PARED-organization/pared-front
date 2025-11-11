@@ -1,45 +1,5 @@
 import {create} from "zustand"
 
-interface CheckBoxState {
-  allChecked: boolean;
-  items: boolean[];
-  toggleItem: (index: number) => void;
-  toggleAll: () => void;
-}
-
-interface PolicyBoxInfo{
-    title:string;
-    moreInfo:string;
-    toggled:boolean;
-    isNecessary:boolean;
-}
-
-interface PolicyBoxState{
-    policyItems:PolicyBoxInfo[];
-    togglePolicyItem:(index:number) => void
-}
-
-export const useCheckBox = create<CheckBoxState>((set) => ({
-  allChecked: false,
-  items: [false, false, false, false, false],
-
-  toggleItem: (index) =>
-    set((state) => {
-      const newItems = [...state.items];
-      newItems[index] = !newItems[index];
-      const allChecked = newItems.every((v) => v);
-      return { items: newItems, allChecked };
-    }),
-
-  toggleAll: () =>
-    set((state) => {
-      const newValue = !state.allChecked;
-      return {
-        allChecked: newValue,
-        items: state.items.map(() => newValue),
-      };
-    }),
-}));
 
 const initialPolicyItems = [
         {
@@ -74,7 +34,8 @@ const initialPolicyItems = [
 서비스 운영을 방해하는 행위\n
 공공질서 및 미풍양속에 반하는 행위\n`,
             toggled:false,
-            isNecessary:true
+            isNecessary:true,
+            checked:false
         },
     {
         title:"개인정보 처리방침 동의 (필수)",
@@ -100,7 +61,8 @@ const initialPolicyItems = [
 4. 동의 거부권 및 불이익 안내\n
 이용자는 개인정보 수집 및 이용에 동의하지 않을 권리가 있으나, 필수 항목에 동의하지 않을 경우 서비스 이용이 제한될 수 있습니다.\n`,
             toggled:false,
-            isNecessary:true
+            isNecessary:true,
+            checked:false
     },
     {
         title:"마케팅 정보 수신 동의 (선택)",
@@ -115,7 +77,8 @@ const initialPolicyItems = [
 
 이용자는 언제든지 마케팅 정보 수신을 거부할 수 있으며, 거부 시 서비스 이용에 불이익은 없습니다.\n`,
             toggled:false,
-            isNecessary:false
+            isNecessary:false,
+            checked:false
     },
     {
         title:"위치정보 이용약관 동의 (선택)",
@@ -138,25 +101,86 @@ const initialPolicyItems = [
 제4조 (동의 철회)\n
 이용자는 언제든지 위치정보 이용에 대한 동의를 철회할 수 있으며, 철회 즉시 관련 정보의 수집 및 이용은 중단됩니다.\n` ,
             toggled:false,
-            isNecessary:false
+            isNecessary:false,
+            checked:false
     }
     ,
     {
         title:"만 14세 이상입니다 (필수)",
         moreInfo:"",
         toggled:false,
-        isNecessary:true
+        isNecessary:true,
+            checked:false
     }
     
   ] satisfies PolicyBoxInfo[];
 
-export const policyBox = create<PolicyBoxState>((set)=>({
-    policyItems:initialPolicyItems,
+interface CheckBoxState {
+  allChecked: boolean;
+  items: PolicyBoxInfo[];
+  toggleItem: (index: number) => void;
+  toggleAll: () => void;
+  togglePolicyItem:(index:number)=>void;
+  allNecessaryAgreed: ()=>boolean;
+}
 
-   togglePolicyItem: (index) =>
-    set((state) => ({
-      policyItems: state.policyItems.map((it, i) =>
-        i === index ? { ...it, toggled: !it.toggled } : it
-      ),
-    })),
+interface PolicyBoxInfo{
+    title:string;
+    moreInfo:string;
+    toggled:boolean;
+    isNecessary:boolean;
+    checked:boolean;
+}
+
+
+interface SignUpState{
+    step: number;
+    isGeneral: boolean;
+    setStep: (step:number) => void;
+    setGeneral:(general:boolean) => void;
+}
+
+export const signUpInfo = create<SignUpState>((set)=>({
+    step: 1,
+    isGeneral: true,
+    setStep: (step) => set({step}),
+    setGeneral: (isGeneral) => set({isGeneral}),
 }))
+
+export const useCheckBox = create<CheckBoxState>((set,get) => ({
+  allChecked: false,
+  items: initialPolicyItems,
+
+  toggleItem: (index) =>
+    set((state) => {
+      const newItems = [...state.items];
+      newItems[index].checked = !newItems[index].checked;
+      const allChecked = newItems.every((v) => v);
+      return { items: newItems, allChecked };
+    }),
+
+  toggleAll: () =>
+    set((state) => {
+      const newValue = !state.allChecked;
+      const newItems = [...state.items];
+      state.items.map((it)=>it.checked = newValue);
+      return {
+        allChecked: newValue,
+        items: newItems
+      };
+    }),
+    togglePolicyItem: (index) =>
+    set((state) => {
+      const newItems = [...state.items];
+      newItems[index].toggled = !newItems[index].toggled;
+      return {items:newItems};
+    }),
+
+    allNecessaryAgreed: ()=>{
+        const {items} = get();
+        return items
+            .filter((item)=>item.isNecessary)
+            .every((item)=>item.checked)
+            
+    },
+}));

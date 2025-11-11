@@ -4,13 +4,20 @@ import { create } from "zustand";
 interface ModalState {
   message: string | null;
   show: boolean;
-  openModal: (msg: string) => void;
+  openModal: (msg: string,onClose?:()=>void) => void;
   closeModal: () => void;
+  onCloseCallBack?: ()=>void;
 }
 
-export const useModalStore = create<ModalState>((set) => ({
+export const useModalStore = create<ModalState>((set,get) => ({
   message: null,
   show: false,
-  openModal: (msg) => set({ show: true, message: msg }),
-  closeModal: () => set({ show: false, message: null }),
+  onCloseCallBack: undefined,
+  openModal: (msg,onClose) => set({ show: true, message: msg,onCloseCallBack:onClose }),
+  closeModal: () => {
+    const cb = get().onCloseCallBack;
+    if(cb) cb();
+    set({show:false, message:null, onCloseCallBack:undefined})
+  }
+  
 }));

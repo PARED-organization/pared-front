@@ -4,7 +4,11 @@
 
 import { create } from "zustand";
 import CheckBoxRound from "./CheckBoxRound";
-import {useCheckBox,policyBox} from "./useSignUpStore"
+import {useCheckBox} from "./useSignUpStore"
+import { signUpInfo } from "./useSignUpStore";
+import { useModalStore } from "./useModalStore";
+import { useRouter } from "next/navigation";
+
 
 
 const Tag = ({ children, type = "required" }) => (
@@ -33,8 +37,17 @@ const Row = ({children,style="none"}) => (
 );
 
 export default function PolicyForm(){
-    const {allChecked,items,toggleItem,toggleAll} = useCheckBox();
-    const {policyItems,togglePolicyItem} = policyBox();
+    const {step,isGeneral,setStep,setGeneral} = signUpInfo();
+    const {allChecked,items,toggleItem,toggleAll,togglePolicyItem,allNecessaryAgreed} = useCheckBox();
+    const {message,show,closeModal,openModal} = useModalStore();
+
+    const handleClick = ()=>{
+        openModal("회원가입이 완료되었습니다.",()=>{
+            //TODO: router push
+            setStep(3);
+        })
+    }
+
     return (
         <>
             <h1 className="text-[24px] mt-[50px] font-[extrabold]">서비스 이용약관을 확인해 주세요.</h1>
@@ -50,12 +63,12 @@ export default function PolicyForm(){
                 </Row>
 
                 {
-                    policyItems.map((data,index)=>(
+                    items.map((data,index)=>(
                         <div key={index}>
                             <Row>
                             <div className="flex items-start gap-3">
                                 <label className="flex items-center gap-2 cursor-pointer" >
-                                    <CheckBoxRound checked={items[index]} onChange={()=>toggleItem(index)} size="lg"/>
+                                    <CheckBoxRound checked={items[index].checked} onChange={()=>{toggleItem(index)}} size="lg"/>
                                 </label>
                                 <span className="font-semibold text-gray-800 bg-orange-400 ml-[10px] cursor-pointer" onClick={()=>togglePolicyItem(index)}>{data.title}</span>
                             </div>
@@ -82,9 +95,15 @@ export default function PolicyForm(){
                     
                 } 
 
-                <div className="mt-[50px] flex flex-col items-center px-4 mx-auto justify-center text-[12px] w-[440px] bg-[#FF9466] border-[1px] rounded-[3px] border-[#F3F3F3] text-[white] h-[30px] ">
+                <button type="button" className="mt-[50px] flex flex-col items-center px-4 mx-auto justify-center text-[12px] w-[440px] bg-[#FF9466] border-[1px] rounded-[3px] border-[#F3F3F3] text-[white] h-[30px] " onClick={()=>{
+                    if(allNecessaryAgreed()){
+                        handleClick();
+                    }else{
+                        openModal("필수인 약관에 모두 동의해주세요.")
+                    }
+                }}>
                     다음
-                </div>
+                </button>
             </div>
 
             
