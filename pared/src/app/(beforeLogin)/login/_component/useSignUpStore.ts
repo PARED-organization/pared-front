@@ -1,3 +1,4 @@
+import { p } from "framer-motion/client";
 import {create} from "zustand"
 
 
@@ -115,6 +116,48 @@ const initialPolicyItems = [
     
   ] satisfies PolicyBoxInfo[];
 
+interface SignUpBasisState{
+  loginTypeIsEmail:boolean;
+  loginTypeIsPhoneNumber:boolean;
+  phoneNumber:string;
+  email:string;
+  isSameChecked:boolean;
+  failedString: string;
+  password:string;
+  checkPassword:string;
+
+  sameCheck:(isSame:boolean)=>boolean;
+  setSameCheck:(isSameChecked:boolean)=>void;
+  emailCheck:(loginTypeIsEmail:boolean)=>void;
+  phoneNumberCheck:(loginTypeIsPhoneNumber:boolean)=>void
+  isLegalPassword:()=>boolean;
+  setFailedString:(failedString:string)=>void;
+  setEmail: (email: string) => void;
+  setPassword:(password:string)=>void;
+  setCheckPassword:(checkPassword:string)=>void;
+}
+
+export const updateSignUpBasis = create<SignUpBasisState>((set,get)=>({
+    loginTypeIsEmail:true,
+    loginTypeIsPhoneNumber:false,
+    phoneNumber:'',
+    email:'',
+    isSameChecked:false,
+    failedString:'',
+    password:'',
+    checkPassword:'',
+    sameCheck : (isSame:boolean)=>{ return isSame},
+    isLegalPassword:()=>{return false},
+    emailCheck: (loginTypeIsEmail)=>set({loginTypeIsEmail}),
+    phoneNumberCheck:(loginTypeIsPhoneNumber) => set({loginTypeIsPhoneNumber}),
+    setSameCheck:(isSameChecked:boolean)=>set({isSameChecked}),
+    setFailedString:(failedString:string)=>set({failedString}),
+    setEmail:(email)=>set({email}),
+    setPassword:(password)=>set({password}),
+    setCheckPassword:(checkPassword)=>set({checkPassword}),
+    
+}))
+
 interface CheckBoxState {
   allChecked: boolean;
   items: PolicyBoxInfo[];
@@ -123,6 +166,34 @@ interface CheckBoxState {
   togglePolicyItem:(index:number)=>void;
   allNecessaryAgreed: ()=>boolean;
 }
+
+interface KoreaGeo{
+  sido:string,
+  siGunGu:string,
+  eupMyunDong:string
+}
+
+interface UserInfo{
+  userRole: 'parent' | 'languageTherapihst';
+  profilePic?: string;
+  nickName: string;
+  introduce?: string;
+  geo:KoreaGeo;
+  isInvited: boolean
+  userInfoStep:number;
+  setRole:(role: 'parent' | 'languageTherapihst')=>void;
+  setUserInfoStep:(userInfoStep:number)=>void;
+}
+
+export const updateUserInfo = create<UserInfo>((set,get)=>({
+  userInfoStep:0,
+  userRole:'parent',
+  nickName:'',
+  geo:{sido:'',siGunGu:'',eupMyunDong:''},
+  isInvited:false,
+  setRole: (userRole: 'parent' | 'languageTherapihst')=>set({userRole}),
+  setUserInfoStep:(userInfoStep:number) => set({userInfoStep})
+}))
 
 interface PolicyBoxInfo{
     title:string;

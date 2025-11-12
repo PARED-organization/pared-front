@@ -4,6 +4,7 @@ import LoginForm from "./_component/LoginForm";
 import SocialLogin from "./_component/SocialLogin";
 import PolicyForm from "./_component/PolicyForm";
 import ParedModal from "./_component/ParedModal";
+import WriteMoreInfo from "./_component/WriteMoreInfo";
 import { signUpInfo } from "./_component/useSignUpStore";
 
 
@@ -53,7 +54,7 @@ export default function LoginPage() {
           {
             step === 3 && (
               <>
-                {/*<WriteMoreInfo/> */}
+                {<WriteMoreInfo/>}
               </>
             )
           }

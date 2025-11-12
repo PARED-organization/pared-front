@@ -40,13 +40,9 @@ export default function PolicyForm(){
     const {step,isGeneral,setStep,setGeneral} = signUpInfo();
     const {allChecked,items,toggleItem,toggleAll,togglePolicyItem,allNecessaryAgreed} = useCheckBox();
     const {message,show,closeModal,openModal} = useModalStore();
-
-    const handleClick = ()=>{
-        openModal("회원가입이 완료되었습니다.",()=>{
-            //TODO: router push
-            setStep(3);
-        })
-    }
+    const router = useRouter();
+ 
+    
 
     return (
         <>
@@ -97,7 +93,8 @@ export default function PolicyForm(){
 
                 <button type="button" className="mt-[50px] flex flex-col items-center px-4 mx-auto justify-center text-[12px] w-[440px] bg-[#FF9466] border-[1px] rounded-[3px] border-[#F3F3F3] text-[white] h-[30px] " onClick={()=>{
                     if(allNecessaryAgreed()){
-                        handleClick();
+                        //handleClick();
+                        setStep(3);
                     }else{
                         openModal("필수인 약관에 모두 동의해주세요.")
                     }
