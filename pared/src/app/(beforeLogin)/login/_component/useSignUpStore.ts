@@ -175,24 +175,33 @@ interface KoreaGeo{
 
 interface UserInfo{
   userRole: 'parent' | 'languageTherapihst';
-  profilePic?: string;
+  profilePic: string;
   nickName: string;
   introduce?: string;
   geo:KoreaGeo;
   isInvited: boolean
   userInfoStep:number;
+  infomation:string;
   setRole:(role: 'parent' | 'languageTherapihst')=>void;
   setUserInfoStep:(userInfoStep:number)=>void;
+  setProfilePic:(profilePic:string)=>void;
+  setNickName:(nickName:string)=>void;
+  setInfomation:(infomation:string)=>void;
 }
 
 export const updateUserInfo = create<UserInfo>((set,get)=>({
   userInfoStep:0,
+  profilePic:"/images/common/default_profile.png",
   userRole:'parent',
   nickName:'',
   geo:{sido:'',siGunGu:'',eupMyunDong:''},
   isInvited:false,
+  infomation:'',
   setRole: (userRole: 'parent' | 'languageTherapihst')=>set({userRole}),
-  setUserInfoStep:(userInfoStep:number) => set({userInfoStep})
+  setUserInfoStep:(userInfoStep:number) => set({userInfoStep}),
+  setProfilePic:(profilePic:string)=>set({profilePic}),
+  setNickName:(nickName)=>set({nickName}),
+  setInfomation:(infomation:string)=>set({infomation}),
 }))
 
 interface PolicyBoxInfo{
