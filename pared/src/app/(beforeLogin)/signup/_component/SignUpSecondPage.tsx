@@ -6,7 +6,7 @@ import {  Pencil } from "lucide-react";
 import Image from "next/image";
 import WhiteCenterPage from "./WhiteCenterPage";
 export default function SecondPage(){
-    const {userInfoStep,setRole,setUserInfoStep,profilePic,setProfilePic,nickName,setNickName} = updateUserInfo();
+    const {userInfoStep,setRole,setUserInfoStep,profilePic,setProfilePic,nickName,setNickName,userRole,therapistRole,setTherapistRole} = updateUserInfo();
 
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -21,8 +21,6 @@ export default function SecondPage(){
     const handleEditClick = ()=>{
         fileInputRef.current?.click()
     }
-
-    //점심 먹는 중
     
     return (
         <WhiteCenterPage>
@@ -52,6 +50,16 @@ export default function SecondPage(){
                                         value={nickName}
                                         onChange={(e)=>setNickName(e.target.value)}
                                         />
+                                    {
+                                        userRole === 'languageTherapist' && 
+                                        <input
+                                        className="bg-[#fff] w-[420px] h-[44px] border border-[#D9D9D9] rounded-[4px] pl-[25px] focus:outline-none font-medium text-[15px]"
+                                        type="text"
+                                        placeholder="직무를 입력해주세요."
+                                        value={therapistRole}
+                                        onChange={(e)=>setTherapistRole(e.target.value)}
+                                        />
+                                    }
 
                                         <div className="flex flex-row mt-[100px] items-center justify-between w-[420px] h-[44px]">
                                             <button type="button" className="bg-[#FFF] text-[#FF9466] w-[150px] rounded-[3px] h-[44px] border-[#FF9466] border-[1px]" onClick={()=>{setUserInfoStep(0);}}>

@@ -174,7 +174,8 @@ interface KoreaGeo{
 }
 
 interface UserInfo{
-  userRole: 'parent' | 'languageTherapihst';
+  userRole: 'parent' | 'languageTherapist';
+  therapistRole?: string;
   profilePic: string;
   nickName: string;
   introduce?: string;
@@ -182,12 +183,13 @@ interface UserInfo{
   isInvited: boolean
   userInfoStep:number;
   infomation:string;
-  setRole:(role: 'parent' | 'languageTherapihst')=>void;
+  setRole:(role: 'parent' | 'languageTherapist')=>void;
   setUserInfoStep:(userInfoStep:number)=>void;
   setProfilePic:(profilePic:string)=>void;
   setNickName:(nickName:string)=>void;
   setInfomation:(infomation:string)=>void;
   setGeo:(geo:KoreaGeo)=>void;
+  setTherapistRole:(therapistRole:string)=>void
 }
 
 export const updateUserInfo = create<UserInfo>((set,get)=>({
@@ -198,12 +200,13 @@ export const updateUserInfo = create<UserInfo>((set,get)=>({
   geo:{sido:'',siGunGu:'',eupMyunDong:''},
   isInvited:false,
   infomation:'',
-  setRole: (userRole: 'parent' | 'languageTherapihst')=>set({userRole}),
+  setRole: (userRole: 'parent' | 'languageTherapist')=>set({userRole}),
   setUserInfoStep:(userInfoStep:number) => set({userInfoStep}),
   setProfilePic:(profilePic:string)=>set({profilePic}),
   setNickName:(nickName)=>set({nickName}),
   setInfomation:(infomation:string)=>set({infomation}),
-  setGeo:(geo:KoreaGeo) => set({geo})
+  setGeo:(geo:KoreaGeo) => set({geo}),
+  setTherapistRole: (therapistRole)=>set({therapistRole})
 }))
 
 interface PolicyBoxInfo{

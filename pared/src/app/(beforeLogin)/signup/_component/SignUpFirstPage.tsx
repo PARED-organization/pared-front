@@ -17,8 +17,8 @@ export default function FirstPage(){
                                     className="mt-[50px]"
                                     />
                             </div>
-                            <div className="bg-[#fff]  rounded-[24px] shadow-[24px] p-10 flex flex-col items-center w-[450px] h-[600px] max-w-sm ml-[100px] mt-[150px] hover:border-[3px] hover:border-[#FF9466]" onClick={()=>{setRole('languageTherapihst');setUserInfoStep(1)}}>
-                                <h1 className="text-[24px] mt-[50px] font-[extrabold]">언어치료 종사자</h1>
+                            <div className="bg-[#fff]  rounded-[24px] shadow-[24px] p-10 flex flex-col items-center w-[450px] h-[600px] max-w-sm ml-[100px] mt-[150px] hover:border-[3px] hover:border-[#FF9466]" onClick={()=>{setRole('languageTherapist');setUserInfoStep(1)}}>
+                                <h1 className="text-[24px] mt-[50px] font-[extrabold]">치료 종사자</h1>
                                 <Image
                                     src="/images/common/lang_therapyst.png"
                                     alt="parents"
