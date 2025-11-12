@@ -8,6 +8,7 @@ import FirstPage from "./_component/SignUpFirstPage";
 import SecondPage from "./_component/SignUpSecondPage";
 import ThirdPage from "./_component/SignUpThirdPage";
 import FourthPage from "./_component/SignupFourthPage";
+import FifthPage from "./_component/SignUpFifthPage";
 export default function signUpPage(){
     const [isWaiting,setIsWaiting] = useState(true);
 
@@ -55,6 +56,10 @@ export default function signUpPage(){
                         {
                             userInfoStep === 3 &&
                             <FourthPage/>
+                        }
+                        {
+                            userInfoStep === 4 &&
+                            <FifthPage/>
                         }
                     </div>
                 }

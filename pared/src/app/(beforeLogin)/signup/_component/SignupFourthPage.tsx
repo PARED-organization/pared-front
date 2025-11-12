@@ -3,7 +3,6 @@
 import { useEffect,useState } from "react";
 import WhiteCenterPage from "./WhiteCenterPage";
 import { updateUserInfo } from "../../login/_component/useSignUpStore";
-
 interface RegionData{
     [sido:string]:{
         [sigungu:string]:string[]
@@ -43,73 +42,63 @@ export default function FourthPage(){
     const {setUserInfoStep,setInfomation,infomation} = updateUserInfo();
     return(
         <WhiteCenterPage>
-            <div>
-                <div className="flex flex-col gap-4 p-6 w-full max-w-md mx-auto bg-white rounded-lg shadow">
-      {/* 시/도 */}
-      <div>
-        <label className="block text-sm font-semibold mb-1">시 / 도</label>
-        <select
-          value={sido}
-          onChange={handleSidoChange}
-          className="w-full border border-gray-300 rounded-md px-3 py-2"
-        >
-          <option value="">시/도를 선택하세요</option>
-          {Object.keys(regionData).map((name) => (
-            <option key={name} value={name}>
-              {name}
+            <div className="flex flex-row items-center w-[420px] h-[44px] mt-[15px]">
+                <label id="sido" className="flex items-center gap-2 w-[100px]">시 / 도</label>
+                <select
+                    name="sido"
+                    value={sido}
+                    onChange={handleSidoChange}
+                    className="bg-[#fff] w-[300px] h-[44px] border border-[#D9D9D9] rounded-[4px] pl-[25px] focus:outline-none font-medium text-[15px]"
+                >
+                <option value="">시/도를 선택하세요</option>
+                {Object.keys(regionData).map((name) => (
+                    <option key={name} value={name}>
+                {name}
             </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 시/군/구 */}
-      <div>
-        <label className="block text-sm font-semibold mb-1">시 / 군 / 구</label>
-        <select
-          value={sigungu}
-          onChange={handleSigunguChange}
-          disabled={!sido}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 disabled:bg-gray-100"
-        >
-          <option value="">시/군/구를 선택하세요</option>
+            ))}
+            </select>
+            </div>
+            <div className="flex flex-row items-center w-[420px] h-[44px] mt-[15px]">
+                <label id="sigungu" className="flex items-center gap-2 w-[100px]">시 / 군 / 구</label>
+                <select
+                    name="sigungu"
+                    value={sigungu}
+                    onChange={handleSigunguChange}
+                    className="bg-[#fff] w-[300px] h-[44px] border border-[#D9D9D9] rounded-[4px] pl-[25px] focus:outline-none font-medium text-[15px]"
+                >
+                <option value="">시/군/구를 선택하세요</option>
           {sigunguList.map((name) => (
             <option key={name} value={name}>
               {name}
             </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 읍/면/동 */}
-      <div>
-        <label className="block text-sm font-semibold mb-1">읍 / 면 / 동</label>
-        <select
-          value={dong}
-          onChange={(e) => setDong(e.target.value)}
-          disabled={!sigungu}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 disabled:bg-gray-100"
-        >
-          <option value="">읍/면/동을 선택하세요</option>
+            ))}
+            </select>
+            </div>
+            <div className="flex flex-row items-center w-[420px] h-[44px] mt-[15px]">
+                <label id="eupMyunDong" className="flex items-center gap-2 w-[100px]">읍 / 면 / 동</label>
+                <select
+                    name="eupMyunDong"
+                    value={dong}
+                    onChange={(e)=>setDong(e.target.value)}
+                    className="bg-[#fff] w-[300px] h-[44px] border border-[#D9D9D9] rounded-[4px] pl-[25px] focus:outline-none font-medium text-[15px]"
+                >
+                <option value="">읍/면/동을 선택하세요</option>
           {dongList.map((name) => (
             <option key={name} value={name}>
               {name}
             </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 현재 선택된 지역 표시 */}
-      <div className="mt-4 text-sm text-gray-700">
-        {sido && (
-          <>
-            선택된 지역: <span className="font-semibold">{sido}</span>
-            {sigungu && ` > ${sigungu}`}
-            {dong && ` > ${dong}`}
-          </>
-        )}
-      </div>
-    </div>
+            ))}
+            </select>
             </div>
+            
+            <div className="flex flex-row mt-[100px] items-center justify-between w-[420px] h-[44px]">
+                                            <button type="button" className="bg-[#FFF] text-[#FF9466] w-[150px] rounded-[3px] h-[44px] border-[#FF9466] border-[1px]" onClick={()=>{setUserInfoStep(2);}}>
+                                                이전으로
+                                            </button>
+                                            <button type="button" className="bg-[#FF9466] text-[white] w-[150px] rounded-[3px] h-[44px]" onClick={()=>{setUserInfoStep(4)}}>
+                                                다음
+                                            </button>
+                                        </div>
         </WhiteCenterPage>
     )
 }

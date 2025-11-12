@@ -187,6 +187,7 @@ interface UserInfo{
   setProfilePic:(profilePic:string)=>void;
   setNickName:(nickName:string)=>void;
   setInfomation:(infomation:string)=>void;
+  setGeo:(geo:KoreaGeo)=>void;
 }
 
 export const updateUserInfo = create<UserInfo>((set,get)=>({
@@ -202,6 +203,7 @@ export const updateUserInfo = create<UserInfo>((set,get)=>({
   setProfilePic:(profilePic:string)=>set({profilePic}),
   setNickName:(nickName)=>set({nickName}),
   setInfomation:(infomation:string)=>set({infomation}),
+  setGeo:(geo:KoreaGeo) => set({geo})
 }))
 
 interface PolicyBoxInfo{
