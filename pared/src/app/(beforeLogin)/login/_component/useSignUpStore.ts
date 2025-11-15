@@ -117,45 +117,53 @@ const initialPolicyItems = [
   ] satisfies PolicyBoxInfo[];
 
 interface SignUpBasisState{
-  loginTypeIsEmail:boolean;
-  loginTypeIsPhoneNumber:boolean;
   phoneNumber:string;
   email:string;
+  authStr?:string
   isSameChecked:boolean;
+  isEmailVerified:boolean
   failedString: string;
   password:string;
   checkPassword:string;
+  isVerifyClicked:boolean;
+  isEmailVerifiedHidden:boolean;
 
   sameCheck:(isSame:boolean)=>boolean;
   setSameCheck:(isSameChecked:boolean)=>void;
-  emailCheck:(loginTypeIsEmail:boolean)=>void;
-  phoneNumberCheck:(loginTypeIsPhoneNumber:boolean)=>void
   isLegalPassword:()=>boolean;
   setFailedString:(failedString:string)=>void;
   setEmail: (email: string) => void;
   setPassword:(password:string)=>void;
   setCheckPassword:(checkPassword:string)=>void;
+  setPhoneNumber:(phoneNumber:string)=>void;
+  setAuthStr:(authStr:string)=>void;
+  setIsVerifyClicked:(isVerifyClicked:boolean)=>void;
+  setIsEmailVerified:(isEmailVerified:boolean)=>void
+  setIsEmailVerifiedHidden:(isEmailVerifiedHidden:boolean)=>void;
 }
 
 export const updateSignUpBasis = create<SignUpBasisState>((set,get)=>({
-    loginTypeIsEmail:true,
-    loginTypeIsPhoneNumber:false,
     phoneNumber:'',
     email:'',
     isSameChecked:false,
     failedString:'',
     password:'',
     checkPassword:'',
+    isVerifyClicked: true,
+    isEmailVerified: false,
+    isEmailVerifiedHidden: true,
     sameCheck : (isSame:boolean)=>{ return isSame},
     isLegalPassword:()=>{return false},
-    emailCheck: (loginTypeIsEmail)=>set({loginTypeIsEmail}),
-    phoneNumberCheck:(loginTypeIsPhoneNumber) => set({loginTypeIsPhoneNumber}),
     setSameCheck:(isSameChecked:boolean)=>set({isSameChecked}),
     setFailedString:(failedString:string)=>set({failedString}),
     setEmail:(email)=>set({email}),
     setPassword:(password)=>set({password}),
     setCheckPassword:(checkPassword)=>set({checkPassword}),
-    
+    setPhoneNumber:(phoneNumber:string)=>set({phoneNumber}),
+    setAuthStr:(authStr:string)=>set({authStr}),
+    setIsVerifyClicked:(isVerifyClicked:boolean)=>set({isVerifyClicked}),
+    setIsEmailVerified:(isEmailVerified:boolean)=>set({isEmailVerified}),
+    setIsEmailVerifiedHidden:(isEmailVerifiedHidden:boolean)=>set({isEmailVerifiedHidden})
 }))
 
 interface CheckBoxState {
@@ -165,6 +173,7 @@ interface CheckBoxState {
   toggleAll: () => void;
   togglePolicyItem:(index:number)=>void;
   allNecessaryAgreed: ()=>boolean;
+  getMarketingAgreed:()=>boolean;
 }
 
 interface KoreaGeo{
@@ -268,4 +277,9 @@ export const useCheckBox = create<CheckBoxState>((set,get) => ({
             .every((item)=>item.checked)
             
     },
+
+    getMarketingAgreed: ()=>{
+      const {items} = get();
+      return items[2].checked;
+    }
 }));
