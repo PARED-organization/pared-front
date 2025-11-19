@@ -7,6 +7,12 @@ import CommentToggle from "../write/components/CommentToggle";
 import FileUpload from "../write/components/FileUpload";
 import FileList from "../write/components/FileList";
 
+import dynamic from "next/dynamic";
+import TipTapEditor from "../write/components/TipTapEditor";
+
+
+
+
 export default function Write() {
   const [visibility, setVisibility] = useState("members");
   const [isToggleOn, setIsToggleOn] = useState(false);
@@ -47,15 +53,15 @@ export default function Write() {
             visibility={visibility}
             setVisibility={setVisibility}
           />
-          <div style={{ marginLeft: 92 }}>
+          {/* <div style={{ marginLeft: 92 }}>
             <CommentToggle
               isToggleOn={isToggleOn}
               setIsToggleOn={setIsToggleOn}
             />
-          </div>
+          </div> */}
         </div>
 
-        <div>
+        {/* <div>
           <input
             type="text"
             placeholder="공지사항 제목을 입력하세요"
@@ -66,10 +72,11 @@ export default function Write() {
           <input
             type="text"
             placeholder="글자수를 입력하세요"
-            className="w-full h-[303px] border border-[#FF9466] mb-[40px] px-[12px] py-[6px] text-[16px] rounded-[4px]"
+            className="w-full h-[453px] border border-[#FF9466] mb-[40px] px-[12px] py-[6px] text-[16px] rounded-[4px]"
           />
-        </div>
-
+        </div> */}
+        {<TipTapEditor/>}
+{/* 
         <FileUpload
           dragActive={dragActive}
           setDragActive={setDragActive}
@@ -78,7 +85,7 @@ export default function Write() {
           inputRef={inputRef}
         />
 
-        <FileList files={files} />
+        <FileList files={files} /> */}
 
         <div
           style={{
