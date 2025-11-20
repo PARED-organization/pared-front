@@ -5,12 +5,13 @@ import Image from "next/image";
 import { updateUserInfo } from "../../login/_component/useSignUpStore";
 
 export default function WhiteCenterPage({children}){
-    const {userInfoStep} = updateUserInfo();
+    const {userInfoStep,userRole} = updateUserInfo();
+    const maxValue  = (userRole==='parent' ? 25 : 20);
     return(
         <>
         <div className="z-[150] absolute left-1/2 -translate-x-1/2 items-center justify-center mt-[100px]">
                                  <ProgressBar
-                                    completed={25*userInfoStep}
+                                    completed={maxValue*userInfoStep}
                                     maxCompleted={100}
                                     height="20px"
                                     width="700px"

@@ -8,7 +8,7 @@ export default function LoginPage() {
   const access = cookieStore.get("Authorization");
   const refresh = cookieStore.get("Authorization-refresh");
 
-  if (access && refresh) {
+  if (access || refresh) {
     redirect("/home");
   }
 
