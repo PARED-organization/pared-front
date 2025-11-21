@@ -39,12 +39,12 @@ import {
   Image as ImageIcon,
   Youtube as YoutubeIcon
 } from "lucide-react";
-
+import { useWriteInfo } from "./WriteData";
 
 
 export default function TipTapEditor(){
     const [text,setText] = useState('')
-    const [url,setUrl] = useState("");
+    const {content,setContent} = useWriteInfo();
     const fileInputRef = useRef<HTMLInputElement|null>(null);
     const handleImageButton = ()=>{
         fileInputRef?.current?.click();
@@ -141,9 +141,9 @@ export default function TipTapEditor(){
                 alignments:['left','right','center']
             })
         ],
-        content: text,
+        content: content,
         onUpdate({editor}){
-            setText(editor.getHTML());
+            setContent(editor.getHTML());
         },
         shouldRerenderOnTransaction: true,
         immediatelyRender: false
