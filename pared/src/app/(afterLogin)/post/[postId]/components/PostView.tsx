@@ -11,7 +11,7 @@ export default function PostDetail({initialData}) {
 
 
   
-  const {initShowReplies,showReplies,setLikeCnt,likeCnt} = usePostRecommentInfo();
+  const {initShowReplies,showReplies,setLikeCnt,likeCnt,comments,recomments,setCommentsAndRecomments} = usePostRecommentInfo();
   const likeClick = async ()=>{
     const res = await api.post("/api/v1/article/increase-like",{
         articleId:initialData.id
@@ -31,11 +31,13 @@ export default function PostDetail({initialData}) {
   }
 
   
+  
 
   useEffect(() => {
   initShowReplies(initialData.commentDTOList.length);
   setLikeCnt(initialData.likeCnt);
-}, [initialData.commentDTOList]);
+  setCommentsAndRecomments(initialData.commentDTOList);
+}, []);
   return (
     <div>
       <Header />
@@ -105,71 +107,14 @@ export default function PostDetail({initialData}) {
           />
         </div>
         {
-            initialData.commentDTOList.map((data,index)=>(
+            comments.map((data,index)=>(
             <PostComment key={index} idx={index} comment={data}/>
         ))
         }
         
 
         {/* 댓글 리스트가 보일 때 */}
-        {showReplies && (
-          <div className="w-full flex flex-col mt-4 max-w-md ml-[27px]">
-            {[1, 2].map((comment) => (
-              <div
-                key={comment}
-                className="border border-[#FF9466] rounded-[20px] px-[12px] py-[19px] w-full mb-[9.2px]"
-                style={{ width: "calc(100% - 27px)" }}
-              >
-                {/* 프로필 + 날짜 */}
-                <div className="flex text-[14px] text-[#7D7D7D] mb-[9px]">
-                  <div className="flex gap-[6px]">
-                    <Image
-                      src="/images/main/postprofile.svg"
-                      alt="comment profile"
-                      width={24}
-                      height={24}
-                    />
-                    <div>댓글작성자{comment}</div>
-                  </div>
-                  <div className="flex gap-[10px] ml-[24px]">
-                    <div>2024-01-0{comment}</div>
-                    <div>{comment * 2}시간 전</div>
-                  </div>
-                </div>
-
-                {/* 본문 */}
-                <div className="text-[17px] mb-[8px]">
-                  {comment} 번째 댓글 내용입니다. 오른쪽으로 살짝 밀려서
-                  표시됩니다.
-                </div>
-
-                {/* 댓글 수/좋아요 버튼 */}
-                <div className="flex gap-4 text-[14px] text-[#7D7D7D] mt-2 gap-[20px]">
-                  <button
-                    className="flex items-center gap-[5px] rounded px-2 py-1"
-                  >
-                    <Image
-                      src="/images/main/commentnumber.svg"
-                      alt="post detail image"
-                      width={16}
-                      height={16}
-                    />
-                    댓글 수
-                  </button>
-                  <button className="flex gap-4 text-[14px] gap-[5px] text-[#7D7D7D]">
-                    <Image
-                      src="/images/main/favorite.svg"
-                      alt="post detail image"
-                      width={16}
-                      height={16}
-                    />
-                    좋아요
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        
       </div>
     </div>
   );
