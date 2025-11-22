@@ -1,14 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/app/(afterLogin)/home/components/Header";
 import Image from "next/image";
-
+import PostComment from "./PostComment";
+import { usePostRecommentInfo } from "./PostRecommentInfo"; 
+import LikeButton from "./LikeButton";
+import api from "@/app/(beforeLogin)/login/_component/AxiosApi";
 export default function PostDetail({initialData}) {
 
 
-  const [showReplies, setShowReplies] = useState(false);
+  
+  const {initShowReplies,showReplies,setLikeCnt,likeCnt} = usePostRecommentInfo();
+  const likeClick = async ()=>{
+    const res = await api.post("/api/v1/article/increase-like",{
+        articleId:initialData.id
+    });
+    if(res.data.status==="SUCCESS"){
+        setLikeCnt(res.data.data.currentArticleLikeCnt);
+    }
+  }
 
+  const unLikeClick = async ()=>{
+    const res = await api.post("/api/v1/article/decrease-like",{
+        articleId:initialData.id
+    });
+    if(res.data.status==="SUCCESS"){
+        setLikeCnt(res.data.data.currentArticleLikeCnt);
+    }
+  }
+
+  
+
+  useEffect(() => {
+  initShowReplies(initialData.commentDTOList.length);
+  setLikeCnt(initialData.likeCnt);
+}, [initialData.commentDTOList]);
   return (
     <div>
       <Header />
@@ -23,18 +50,24 @@ export default function PostDetail({initialData}) {
               <div className="text-[20px] font-semibold mb-[12px]">
                 {initialData.title}
               </div>
-              <Image
-                src="/images/main/postlike.svg"
-                alt="post detail image"
-                width={100}
-                height={40}
+              <LikeButton
+              
+              initialLiked={initialData.currentUserIsLiked}
+              onToggle={(state)=>{
+                if(state){
+                    likeClick()
+                }else{
+                    unLikeClick()
+                }
+              }}
               />
+              
             </div>
             <div className="flex text-[16px] text-[#6A7380] gap-[20px] mb-[63px]">
               <div>작성시간 : {initialData.baseTime.createdDate}</div>
               <div>작성자 : {initialData.paredUser.nickName}</div>
               <div>조회수 : {initialData.viewCnt}</div>
-              <div>좋아요 : {initialData.likeCnt}</div>
+              <div>좋아요 : {likeCnt}</div>
             </div>
             <div className="mb-[11px]" dangerouslySetInnerHTML={{__html:initialData.content}}>
               
@@ -71,56 +104,12 @@ export default function PostDetail({initialData}) {
             height={48}
           />
         </div>
-
-        {/* 기존 댓글 박스 */}
-        <div className="border border-[#FF9466] rounded-[20px] px-[12px] py-[19px] w-full max-w-md mt-[37px] flex flex-col gap-2 mb-[9.2px]">
-          {/* 프로필 + 날짜 한 줄 */}
-          <div className="flex text-[14px] text-[#7D7D7D] mb-[9px]">
-            <div className="flex gap-[6px]">
-              <Image
-                src="/images/main/postprofile.svg"
-                alt="post detail image"
-                width={24}
-                height={24}
-              />
-              <div>홍길동</div>
-            </div>
-            <div className="flex gap-[10px] ml-[24px]">
-              <div>2023-02-12</div>
-              <div>3시간 전</div>
-            </div>
-          </div>
-          {/* 본문 */}
-          <div className="text-[17px] mb-[8px]">
-            Torem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
-            vulputate libero et velit interdum, ac aliquet odio mattis.
-          </div>
-
-          {/* 댓글 수와 댓글 좋아요 한 줄 */}
-          <div className="flex gap-4 text-[14px] text-[#7D7D7D] gap-[20px]">
-            <button
-              onClick={() => setShowReplies(!showReplies)}
-              className="flex items-center gap-[5px] rounded px-2 py-1"
-            >
-              <Image
-                src="/images/main/commentnumber.svg"
-                alt="post detail image"
-                width={16}
-                height={16}
-              />
-              댓글 수
-            </button>
-            <button className="flex gap-4 text-[14px] gap-[5px] text-[#7D7D7D]">
-              <Image
-                src="/images/main/favorite.svg"
-                alt="post detail image"
-                width={16}
-                height={16}
-              />
-              좋아요
-            </button>
-          </div>
-        </div>
+        {
+            initialData.commentDTOList.map((data,index)=>(
+            <PostComment key={index} idx={index} comment={data}/>
+        ))
+        }
+        
 
         {/* 댓글 리스트가 보일 때 */}
         {showReplies && (
@@ -157,7 +146,6 @@ export default function PostDetail({initialData}) {
                 {/* 댓글 수/좋아요 버튼 */}
                 <div className="flex gap-4 text-[14px] text-[#7D7D7D] mt-2 gap-[20px]">
                   <button
-                    onClick={() => setShowReplies(!showReplies)}
                     className="flex items-center gap-[5px] rounded px-2 py-1"
                   >
                     <Image

@@ -3,6 +3,8 @@
 @import "draft-js/dist/Draft.css";
 @import '@draft-js-plugins/image/lib/plugin.css';
 
+
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;
@@ -202,3 +204,5 @@ h6.my-custom-headings {
   margin: 0 auto;
   
 }
+
+
