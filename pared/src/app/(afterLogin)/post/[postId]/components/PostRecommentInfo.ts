@@ -30,10 +30,12 @@ interface CommentDTO {
 interface PostRecommentInfo {
   showReplies: boolean[];
   likeCnt: number;
-
+    writeComment:string;
+    
   comments: CommentDTO[];
   recomments: Record<number, CommentDTO[]>;
 
+    setWriteComment:(writeComment:string)=>void;
   setLikeCnt: (likeCnt: number) => void;
   setShowReplies: (index: number) => void;
   initShowReplies: (count: number) => void;
@@ -44,10 +46,10 @@ interface PostRecommentInfo {
 export const usePostRecommentInfo = create<PostRecommentInfo>((set, get) => ({
   showReplies: [],
   likeCnt: 0,
-
+    writeComment:'',
   comments: [],
   recomments: {},
-
+    setWriteComment: (writeComment:string)=>set({writeComment:writeComment}),
   setLikeCnt: (likeCnt) => set({ likeCnt }),
 
   setShowReplies: (index) =>

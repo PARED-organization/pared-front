@@ -11,5 +11,5 @@ export default async function Page({params}){
     `api/v1/article/read-article/${postId}`
   )
   
-  return <PostDetail initialData={res.data.data.articleDTO}/>
+  return <PostDetail initialData={res.data.data.articleDTO} postId={postId}/>
 }

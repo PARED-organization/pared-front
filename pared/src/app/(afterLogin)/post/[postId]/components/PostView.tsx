@@ -1,17 +1,39 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useRef, useLayoutEffect} from "react";
 import Header from "@/app/(afterLogin)/home/components/Header";
 import Image from "next/image";
 import PostComment from "./PostComment";
 import { usePostRecommentInfo } from "./PostRecommentInfo"; 
 import LikeButton from "./LikeButton";
 import api from "@/app/(beforeLogin)/login/_component/AxiosApi";
-export default function PostDetail({initialData}) {
+import MoreMenu from "./MoreMenu";
+import { useRouter } from "next/navigation";
+import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import CommentInput from "./CommentsInput";
+import DOMPurify from 'dompurify'
+//import CommentList from "./CommentList";
+import InnerContent from "./InnerContent";
+
+   const CommentList = React.memo(function CommentList({ innerComments=[] }) {
+  return (
+    innerComments.map((data, index) => (
+      <PostComment key={data.id ?? index} idx={index} comment={data} />
+    ))
+  );
+});
+
+const StaticContent = React.memo(({htmlContent})=>{
+    return(
+        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+    )
+  })
+
+export default function PostDetail({initialData,postId}) {
 
 
   
-  const {initShowReplies,showReplies,setLikeCnt,likeCnt,comments,recomments,setCommentsAndRecomments} = usePostRecommentInfo();
+  const {writeComment,setWriteComment,initShowReplies,showReplies,setLikeCnt,likeCnt,comments,recomments,setCommentsAndRecomments} = usePostRecommentInfo();
   const likeClick = async ()=>{
     const res = await api.post("/api/v1/article/increase-like",{
         articleId:initialData.id
@@ -21,6 +43,9 @@ export default function PostDetail({initialData}) {
     }
   }
 
+  const nonChangedContent = initialData.content;
+
+  const router = useRouter();
   const unLikeClick = async ()=>{
     const res = await api.post("/api/v1/article/decrease-like",{
         articleId:initialData.id
@@ -30,16 +55,33 @@ export default function PostDetail({initialData}) {
     }
   }
 
-  
-  
-
   useEffect(() => {
+    
   initShowReplies(initialData.commentDTOList.length);
   setLikeCnt(initialData.likeCnt);
   setCommentsAndRecomments(initialData.commentDTOList);
 }, []);
+
+  const commentSubmit = async ()=>{
+    const res = await api.post("/api/v1/comment/write-comment",{
+            articleId:initialData.id,
+            parentCommentId:null,
+            content:writeComment
+    })
+    if(res.data.status==="SUCCESS"){
+        initShowReplies(res.data.data.commentDTOList.length);
+        setCommentsAndRecomments(res.data.data.commentDTOList);
+        setWriteComment("")
+    }
+  }
+  
+
+
+  
+
+
   return (
-    <div>
+    <div className="overflow-y-auto">
       <Header />
       <div className="w-full max-w-[1920px] px-[303px] ">
         <div className="text-[32px] font-extrabold mb-[19px]">정보게시판</div>
@@ -52,7 +94,8 @@ export default function PostDetail({initialData}) {
               <div className="text-[20px] font-semibold mb-[12px]">
                 {initialData.title}
               </div>
-              <LikeButton
+              <div className="flex flex-row">
+                <LikeButton
               
               initialLiked={initialData.currentUserIsLiked}
               onToggle={(state)=>{
@@ -63,6 +106,17 @@ export default function PostDetail({initialData}) {
                 }
               }}
               />
+              <MoreMenu
+  onEdit={() => router.push(`/update/${postId}`)}
+  onDelete={() => console.log("글 삭제")}
+  onReport={() => console.log("글 신고")}
+  onCopyLink={() => {
+    navigator.clipboard.writeText(window.location.href);
+    alert("링크가 복사되었습니다!");
+  }}
+/>
+              </div>
+              
               
             </div>
             <div className="flex text-[16px] text-[#6A7380] gap-[20px] mb-[63px]">
@@ -71,17 +125,9 @@ export default function PostDetail({initialData}) {
               <div>조회수 : {initialData.viewCnt}</div>
               <div>좋아요 : {likeCnt}</div>
             </div>
-            <div className="mb-[11px]" dangerouslySetInnerHTML={{__html:initialData.content}}>
-              
-            </div>
-            <div className="flex justify-center items-center mb-[36px]">
-              <Image
-                src="/images/main/postdetail.svg"
-                alt="post detail image"
-                width={245}
-                height={184}
-              />
-            </div>
+            
+            <StaticContent htmlContent={nonChangedContent}/>
+            
           </div>
         </div>
         <div className="px-[51px] text-[18px] font-bold mb-[18px] mt-[31px] gap-[15px] flex items-center">
@@ -91,26 +137,14 @@ export default function PostDetail({initialData}) {
             width={24}
             height={24}
           />
-          숫자 Comments
+          {comments.length} Comments
         </div>
-        <div className="inline-flex items-center border border-[#FF9466] rounded-[20px] h-[96px] px-[12px] py-[19px] w-full max-w-md">
-          <input
-            type="text"
-            className="flex-grow h-full rounded-l-[20px] border-none outline-none"
-            placeholder="댓글을 입력해주세요(최대 N000자)."
-          />
-          <Image
-            src="/images/main/postcomment.svg"
-            alt="post detail image"
-            width={39}
-            height={48}
-          />
+        <div>
+            <CommentInput  commentSubmit={commentSubmit}/>
+          
+        <CommentList innerComments={comments}/>
         </div>
-        {
-            comments.map((data,index)=>(
-            <PostComment key={index} idx={index} comment={data}/>
-        ))
-        }
+        
         
 
         {/* 댓글 리스트가 보일 때 */}
