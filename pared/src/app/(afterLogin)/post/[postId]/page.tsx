@@ -23,7 +23,8 @@ export default async function Page({params}){
   const currentUser = await ServerAxiosApi.get("/api/v1/user/logined-user-info");
   return <PostDetail initialData={res.data.data.articleDTO} postId={postId} currentUser={currentUser.data.data.userDTO}/>
   } catch(e){
-    redirect("/home")
+    
+    console.error(e);
   }
   
 }
