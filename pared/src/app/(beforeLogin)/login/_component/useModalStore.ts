@@ -1,23 +1,35 @@
-// store/useModalStore.ts
 import { create } from "zustand";
+
+interface ModalConfig {
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  showCancelButton?: boolean;
+}
 
 interface ModalState {
   message: string | null;
   show: boolean;
-  openModal: (msg: string,onClose?:()=>void) => void;
+  config: ModalConfig | null;
+  openModal: (msg: string, config?: ModalConfig) => void;
   closeModal: () => void;
-  onCloseCallBack?: ()=>void;
 }
 
-export const useModalStore = create<ModalState>((set,get) => ({
+export const useModalStore = create<ModalState>((set, get) => ({
   message: null,
   show: false,
-  onCloseCallBack: undefined,
-  openModal: (msg,onClose) => set({ show: true, message: msg,onCloseCallBack:onClose }),
-  closeModal: () => {
-    const cb = get().onCloseCallBack;
-    if(cb) cb();
-    set({show:false, message:null, onCloseCallBack:undefined})
-  }
-  
+  config: null,
+
+  openModal: (msg, config) =>
+    set({
+      show: true,
+      message: msg,
+      config: config ?? null,
+    }),
+
+  closeModal: () =>
+    set({
+      show: false,
+      message: null,
+      config: null,
+    }),
 }));

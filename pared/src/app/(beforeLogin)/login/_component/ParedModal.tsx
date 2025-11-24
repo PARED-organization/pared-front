@@ -1,12 +1,11 @@
-'use client'
+"use client";
 
-import Modal from 'react-modal'
-import { useModalStore } from './useModalStore';
-/*overlay는 모달 창 바깥 부분을 처리하는 부분이고,
-content는 모달 창부분이라고 생각하면 쉬울 것이다*/
+import Modal from "react-modal";
+import { useModalStore } from "./useModalStore";
+
 const customModalStyles: ReactModal.Styles = {
   overlay: {
-    backgroundColor: " rgba(0, 0, 0, 0.4)",
+    backgroundColor: " rgba(0, 0, 0, 0.1)",
     width: "100%",
     height: "100vh",
     zIndex: "10",
@@ -19,40 +18,65 @@ const customModalStyles: ReactModal.Styles = {
     width: "360px",
     height: "200px",
     zIndex: "150",
-    position: "absolute",  
+    position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     borderRadius: "10px",
-    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.25)",
     backgroundColor: "white",
-    justifyContent: "space-between",
   },
 };
 
-export default function ParedModal(){
-  const {message,show,closeModal,openModal} = useModalStore();
-    return(
-        <Modal
-          isOpen={show}
-          onRequestClose={()=>closeModal}
-          style={customModalStyles}
-          ariaHideApp={false}
-          contentLabel='Pop Up message'
-          shouldCloseOnOverlayClick={true}
-        >
-          <div
-            className=" flex flex-col bg-white rounded-2xl shadow-2xl items-center justify-between h-[150px]"
-            onClick={(e) => e.stopPropagation()}
+export default function ParedModal() {
+  const { message, show, closeModal, config } = useModalStore();
+
+  const handleConfirm = () => {
+    if (config?.onConfirm) config.onConfirm();
+    closeModal();
+  };
+
+  const handleCancel = () => {
+    if (config?.onCancel) config.onCancel();
+    closeModal();
+  };
+
+  return (
+    <Modal
+      isOpen={show}
+      onRequestClose={closeModal}
+      style={customModalStyles}
+      ariaHideApp={false}
+      contentLabel="Pop Up message"
+      shouldCloseOnOverlayClick={true}
+    >
+      <div
+        className="flex flex-col bg-white rounded-2xl shadow-xl items-center justify-between h-[150px] p-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-[17px] mt-[30px]">{message}</p>
+
+        {/* 버튼 영역 */}
+        <div className="flex gap-3 mb-4 w-full px-3">
+          {/* 확인 버튼 */}
+          <button
+            onClick={handleConfirm}
+            className="flex-1 bg-[#FF9466] text-white rounded-[6px] h-[40px]"
           >
-            <p className="text-[17px] mb-6 mt-[50px]">{message}</p>
+            확인
+          </button>
+          {/* 취소 버튼 (옵션) */}
+          {config?.showCancelButton && (
             <button
-              onClick={closeModal}
-              className="bg-blue-500 text-white rounded-[2px]  w-[320px] bg-[#FF9466] h-[40px]"
+              onClick={handleCancel}
+              className="flex-1 border border-[#FF9466] text-[#FF9466] rounded-[6px] h-[40px]"
             >
-              확인
+              취소
             </button>
-          </div>
-        </Modal>
-    )
+          )}
+
+          
+        </div>
+      </div>
+    </Modal>
+  );
 }

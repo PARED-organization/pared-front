@@ -9,7 +9,7 @@ export default function CommentInput({commentSubmit}) {
     const {writeComment,setWriteComment} = usePostRecommentInfo();
 
   return (
-    <div className={`inline-flex items-center border border-[#FF9466] rounded-[20px] h-[96px] px-[12px] py-[19px] w-full max-w-md `}>
+    <div className={`inline-flex items-center border border-[#FF9466] rounded-[20px] px-[12px] py-[19px] w-full max-w-md `}>
       <textarea
         value={writeComment}
         onChange={
@@ -17,7 +17,8 @@ export default function CommentInput({commentSubmit}) {
             (e)=>{
                 
                 setWriteComment(e.target.value)
-
+                e.target.style.height = "auto";
+                e.target.style.height = `${e.target.scrollHeight}px`;
             }
             
         }

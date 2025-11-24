@@ -11,14 +11,19 @@ import MoreMenu from "./MoreMenu";
 import { useRouter } from "next/navigation";
 import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import CommentInput from "./CommentsInput";
-import DOMPurify from 'dompurify'
-//import CommentList from "./CommentList";
-import InnerContent from "./InnerContent";
+import { useModalStore } from "@/app/(beforeLogin)/login/_component/useModalStore";
+import ParedModal from "@/app/(beforeLogin)/login/_component/ParedModal";
+import ParedReportModal from "./ParedReportModal";
+import { useReportModalStore } from "./ReportModalState";
+import ImageServe from "./ImageServe";
+import GetLoginedUserInfo from "./GetLoginedUserInfo";
 
-   const CommentList = React.memo(function CommentList({ innerComments=[] }) {
+//import CommentList from "./CommentList";
+
+   const CommentList = React.memo(function CommentList({ innerComments=[] ,articleId,currentUser}) {
   return (
     innerComments.map((data, index) => (
-      <PostComment key={data.id ?? index} idx={index} comment={data} />
+      <PostComment key={data.id ?? index} idx={index} comment={data} articleId={articleId} currentUser={currentUser}/>
     ))
   );
 });
@@ -29,10 +34,11 @@ const StaticContent = React.memo(({htmlContent})=>{
     )
   })
 
-export default function PostDetail({initialData,postId}) {
+export default function PostDetail({initialData,postId,currentUser}) {
 
-
-  
+    const {openModal,closeModal} = useModalStore();
+    
+    const {openReportModal} = useReportModalStore();
   const {writeComment,setWriteComment,initShowReplies,showReplies,setLikeCnt,likeCnt,comments,recomments,setCommentsAndRecomments} = usePostRecommentInfo();
   const likeClick = async ()=>{
     const res = await api.post("/api/v1/article/increase-like",{
@@ -44,7 +50,7 @@ export default function PostDetail({initialData,postId}) {
   }
 
   const nonChangedContent = initialData.content;
-
+  
   const router = useRouter();
   const unLikeClick = async ()=>{
     const res = await api.post("/api/v1/article/decrease-like",{
@@ -60,6 +66,7 @@ export default function PostDetail({initialData,postId}) {
   initShowReplies(initialData.commentDTOList.length);
   setLikeCnt(initialData.likeCnt);
   setCommentsAndRecomments(initialData.commentDTOList);
+  
 }, []);
 
   const commentSubmit = async ()=>{
@@ -75,14 +82,41 @@ export default function PostDetail({initialData,postId}) {
     }
   }
   
+  const deleteSubmit = async()=>{
+        const res = await api.delete(`/api/v1/article/delete-article/${initialData.id}`);
+        if(res.data.status==="SUCCESS"){
+            openModal("삭제에 성공하였습니다.",{
+                onConfirm:()=>router.push("/home"),
+                showCancelButton:false
+            })
+        }else{
+            openModal("권한이 없습니다.")
+        }
+  }
+  const reportSubmit = async(articleId,targetUserId,content)=>{
+    const res = await api.post(`/api/v1/article/report-article`,{
+        articleId:articleId,
+        targetUserId:targetUserId,
+        content:content
+    })
 
+    if(res.data.status==="SUCCESS"){
+        openModal("신고에 성공하였습니다.");
+    }else{
+        openModal("권한이 없습니다.");
+    }
+  }
 
   
 
 
+  
   return (
-    <div className="overflow-y-auto">
+    <div >
+        
       <Header />
+      <ParedModal/>
+        <ParedReportModal/>
       <div className="w-full max-w-[1920px] px-[303px] ">
         <div className="text-[32px] font-extrabold mb-[19px]">정보게시판</div>
         <div
@@ -106,15 +140,37 @@ export default function PostDetail({initialData,postId}) {
                 }
               }}
               />
-              <MoreMenu
+              {
+                initialData.paredUser.id === currentUser.id
+                ? 
+                <MoreMenu
   onEdit={() => router.push(`/update/${postId}`)}
-  onDelete={() => console.log("글 삭제")}
-  onReport={() => console.log("글 신고")}
+  onDelete={()=>openModal("삭제하시겠습니까?",{
+    onConfirm:()=> deleteSubmit(),
+    onCancel:()=> closeModal(),
+    showCancelButton: true
+  })}
   onCopyLink={() => {
     navigator.clipboard.writeText(window.location.href);
-    alert("링크가 복사되었습니다!");
+    openModal("링크가 복사되었습니다.")
   }}
 />
+:
+<MoreMenu
+  onReport={() => openReportModal({
+    targetId:initialData.id,
+    id:initialData.paredUser.id,
+    nickname:initialData.paredUser.nickName,
+    profilePic:ImageServe(initialData.paredUser.profilePic.link)
+  },(content)=>reportSubmit(initialData.id,initialData.paredUser.id,content)
+)}
+  onCopyLink={() => {
+    navigator.clipboard.writeText(window.location.href);
+    openModal("링크가 복사되었습니다.")
+  }}
+/>
+              }
+              
               </div>
               
               
@@ -142,7 +198,7 @@ export default function PostDetail({initialData,postId}) {
         <div>
             <CommentInput  commentSubmit={commentSubmit}/>
           
-        <CommentList innerComments={comments}/>
+        <CommentList innerComments={comments} articleId={initialData.id} currentUser={currentUser}/>
         </div>
         
         

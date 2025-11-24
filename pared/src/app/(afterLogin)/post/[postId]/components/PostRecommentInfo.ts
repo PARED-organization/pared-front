@@ -15,7 +15,7 @@ interface UserDTO{
     id:number;
     nickName:string;
     paredRole:string;
-    profliePic:ProfilePic;
+    profilePic:ProfilePic;
 }
 interface CommentDTO {
   id: number;
@@ -24,7 +24,8 @@ interface CommentDTO {
   baseTime: BaseTime;
   commenter:UserDTO;
   mentionMember:UserDTO;
-  
+  likeCnt:number;
+  isCurrentUserLiked:boolean;
 }
 
 interface PostRecommentInfo {

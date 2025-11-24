@@ -93,8 +93,10 @@ const handleStart = () => {
         })
 
         if(res.data.status === "SUCCESS"){
-            openModal("회원가입이 완료되었습니다. 다시 로그인해 주세요.",()=>{
-                location.reload()
+            openModal("회원가입이 완료되었습니다. 다시 로그인해 주세요.",{
+                onConfirm: ()=>location.reload(),
+                showCancelButton:false
+                
             })
         }else{
             openModal("에러가 발생하였습니다." + res.data.message);

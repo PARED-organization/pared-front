@@ -74,8 +74,9 @@ const res = await api.post("/api/v1/article/write-article",{
     console.log(res.data);
     if(res.data.status === "SUCCESS"){
       console.log(res.data.status);
-      openModal("작성에 성공했습니다.",()=>{
-        router.push('/home')
+      openModal("작성에 성공했습니다.",{
+        onConfirm:()=>router.push("/home"),
+        showCancelButton: false
       })
     }else{
       console.log(res.data.message);
