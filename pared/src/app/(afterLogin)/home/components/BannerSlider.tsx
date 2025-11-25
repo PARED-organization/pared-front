@@ -2,15 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import ImageServe from "../../post/[postId]/components/ImageServe";
 
-const bannerImages = [
-  "/images/main/banner.svg",
-  "/images/main/banner.svg",
-  "/images/main/banner.svg",
-];
 
-export default function BannerSlider() {
+
+export default function BannerSlider({banner}) {
   const [currentBanner, setCurrentBanner] = useState(0);
+  const bannerImages = banner.noticeDTOList;
   const next = () =>
     setCurrentBanner((prev) => (prev + 1) % bannerImages.length);
   const prev = () =>
@@ -21,7 +19,7 @@ export default function BannerSlider() {
   return (
     <div className="relative w-full h-[406px] mb-[76px] flex items-center justify-center overflow-hidden">
       <Image
-        src={bannerImages[currentBanner]}
+        src={ImageServe(bannerImages[currentBanner].thumbnail.link)}
         alt="Main Banner"
         width={1920}
         height={406}

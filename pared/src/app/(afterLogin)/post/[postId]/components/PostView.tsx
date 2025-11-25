@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState ,useRef, useLayoutEffect} from "react";
+import React, { useEffect, useState ,useRef, useLayoutEffect, useCallback} from "react";
 import Header from "@/app/(afterLogin)/home/components/Header";
 import Image from "next/image";
 import PostComment from "./PostComment";
@@ -17,16 +17,18 @@ import ParedReportModal from "./ParedReportModal";
 import { useReportModalStore } from "./ReportModalState";
 import ImageServe from "./ImageServe";
 import GetLoginedUserInfo from "./GetLoginedUserInfo";
+import {v4 as uuidv4} from "uuid"
 
 //import CommentList from "./CommentList";
 
-   const CommentList = React.memo(function CommentList({ innerComments=[] ,articleId,currentUser}) {
+
+const CommentList = ({  innerComments=[] ,articleId,currentUser }) => {
   return (
     innerComments.map((data, index) => (
-      <PostComment key={data.id ?? index} idx={index} comment={data} articleId={articleId} currentUser={currentUser}/>
+      <PostComment idx={index} comment={data} articleId={articleId} currentUser={currentUser}/>
     ))
   );
-});
+}
 
 const StaticContent = React.memo(({htmlContent})=>{
     return(
@@ -39,8 +41,79 @@ export default function PostDetail({initialData,postId,currentUser}) {
     const {openModal,closeModal} = useModalStore();
     
     const {openReportModal} = useReportModalStore();
-  const {writeComment,setWriteComment,initShowReplies,showReplies,setLikeCnt,likeCnt,comments,recomments,setCommentsAndRecomments} = usePostRecommentInfo();
+    const isLogined = currentUser ? true : false;
+    const unLoginedAction = ()=>{
+      if(!isLogined){
+          openModal("로그인 후 이용할 수 있습니다.")
+      return false;
+      }else{
+        return true;
+      }
+    }
+    const [page,setPage] = useState(0);
+    const [isLoading,setisLoading] = useState(false);
+
+    
+    const isLoadingRef = useRef(false);
+    const pageRef = useRef(0);
+    const isFinalRef = useRef(false);
+    
+  const handleObserver = (entries)=>{
+    const intersect = entries[0];
+    
+    if(intersect.isIntersecting&&!isFinalRef.current){
+      pageRef.current+=1;
+      console.log(pageRef.current);
+      setPage(pageRef.current);
+    }
+  }
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 0, //  Intersection Observer의 옵션, 0일 때는 교차점이 한 번만 발생해도 실행, 1은 모든 영역이 교차해야 콜백 함수가 실행.
+    });
+    // 최하단 요소를 관찰 대상으로 지정함
+    const observerTarget = document.getElementById("observer");
+    // 관찰 시작
+    if (observerTarget) {
+      observer.observe(observerTarget);
+    }
+  }, []);
+
+  useEffect(()=>{
+    scrollData();
+  },[page])
+
+  const scrollData = async ()=>{
+    setisLoading(true);
+    isLoadingRef.current = true;
+    try{
+      const res = await api.get(`/api/v1/comment/get-more-content/${initialData.id}`,{
+        params:{
+          cursor:page
+        }
+      });
+
+      const newData = res.data.data.commentDTOList;
+
+      if(newData.length>0){
+        setComments([...comments,...newData]);
+      }else{
+        
+        isFinalRef.current = true;
+      }
+    }catch(e){
+      console.error(e);
+    }
+    setisLoading(false)
+    isLoadingRef.current =false;
+  }
+
+  const {writeComment,setWriteComment,initShowReplies,showReplies,setLikeCnt,likeCnt,comments,recomments,setComments} = usePostRecommentInfo();
+  
   const likeClick = async ()=>{
+    
+
+
     const res = await api.post("/api/v1/article/increase-like",{
         articleId:initialData.id
     });
@@ -48,11 +121,14 @@ export default function PostDetail({initialData,postId,currentUser}) {
         setLikeCnt(res.data.data.currentArticleLikeCnt);
     }
   }
+    
+
 
   const nonChangedContent = initialData.content;
   
   const router = useRouter();
   const unLikeClick = async ()=>{
+    
     const res = await api.post("/api/v1/article/decrease-like",{
         articleId:initialData.id
     });
@@ -65,11 +141,16 @@ export default function PostDetail({initialData,postId,currentUser}) {
     
   initShowReplies(initialData.commentDTOList.length);
   setLikeCnt(initialData.likeCnt);
-  setCommentsAndRecomments(initialData.commentDTOList);
+  setComments(initialData.commentDTOList);
   
 }, []);
 
+
+
+
   const commentSubmit = async ()=>{
+    if(!unLoginedAction())
+      return;
     const res = await api.post("/api/v1/comment/write-comment",{
             articleId:initialData.id,
             parentCommentId:null,
@@ -77,12 +158,14 @@ export default function PostDetail({initialData,postId,currentUser}) {
     })
     if(res.data.status==="SUCCESS"){
         initShowReplies(res.data.data.commentDTOList.length);
-        setCommentsAndRecomments(res.data.data.commentDTOList);
+        setComments(res.data.data.commentDTOList);
         setWriteComment("")
     }
   }
   
   const deleteSubmit = async()=>{
+    if(!unLoginedAction())
+      return;
         const res = await api.delete(`/api/v1/article/delete-article/${initialData.id}`);
         if(res.data.status==="SUCCESS"){
             openModal("삭제에 성공하였습니다.",{
@@ -94,6 +177,8 @@ export default function PostDetail({initialData,postId,currentUser}) {
         }
   }
   const reportSubmit = async(articleId,targetUserId,content)=>{
+    if(!unLoginedAction())
+      return;
     const res = await api.post(`/api/v1/article/report-article`,{
         articleId:articleId,
         targetUserId:targetUserId,
@@ -134,17 +219,34 @@ export default function PostDetail({initialData,postId,currentUser}) {
               initialLiked={initialData.currentUserIsLiked}
               onToggle={(state)=>{
                 if(state){
-                    likeClick()
+                  if(!unLoginedAction()){
+                        return false;
+                  }
+                    else{
+                      likeClick()
+                      return true;
+                    }
+                    
                 }else{
-                    unLikeClick()
+                  if(!unLoginedAction())
+                      return false;
+                    else{
+                      unLikeClick()
+                      return true;
+                    }
+                    
                 }
               }}
               />
               {
-                initialData.paredUser.id === currentUser.id
+                isLogined && initialData.paredUser.id === currentUser.id
                 ? 
                 <MoreMenu
-  onEdit={() => router.push(`/update/${postId}`)}
+  onEdit={() => {
+    if(!unLoginedAction())
+      return;
+    router.push(`/update/${postId}`)
+  }}
   onDelete={()=>openModal("삭제하시겠습니까?",{
     onConfirm:()=> deleteSubmit(),
     onCancel:()=> closeModal(),
@@ -157,13 +259,19 @@ export default function PostDetail({initialData,postId,currentUser}) {
 />
 :
 <MoreMenu
-  onReport={() => openReportModal({
+  onReport={() => {
+    if(!unLoginedAction())
+      return;
+    else{
+openReportModal({
     targetId:initialData.id,
     id:initialData.paredUser.id,
     nickname:initialData.paredUser.nickName,
     profilePic:ImageServe(initialData.paredUser.profilePic.link)
   },(content)=>reportSubmit(initialData.id,initialData.paredUser.id,content)
-)}
+)}}
+    }
+    
   onCopyLink={() => {
     navigator.clipboard.writeText(window.location.href);
     openModal("링크가 복사되었습니다.")
@@ -193,13 +301,18 @@ export default function PostDetail({initialData,postId,currentUser}) {
             width={24}
             height={24}
           />
-          {comments.length} Comments
+          {initialData.commentCnt} Comments
         </div>
         <div>
             <CommentInput  commentSubmit={commentSubmit}/>
           
         <CommentList innerComments={comments} articleId={initialData.id} currentUser={currentUser}/>
+
+        
         </div>
+        {/* 로딩 트리거 */}
+      {isLoading && <p>Loading...</p>}
+      <div id="observer" style={{ height: "10px" }}></div>
         
         
 

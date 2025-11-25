@@ -11,16 +11,17 @@ import { useReportModalStore } from "./ReportModalState";
 import ParedModal from "@/app/(beforeLogin)/login/_component/ParedModal";
 import ParedReportModal from "./ParedReportModal";
 export default function PostComment({idx,comment,articleId,currentUser}){
+  const isLogined = currentUser ? true : false;
 
     const imageSrc = ImageServe(comment.commenter.profilePic.link);
     const {showReplies,setShowReplies,recomments,initShowReplies,setCommentsAndRecomments} = usePostRecommentInfo();
-    const replies = recomments[comment.id] ?? [];
+    const [replies,setReplies] = useState([]);
     const [recomment,setRecomment] = useState('');
     const [mentionCommenter,setMentionCommenter] = useState(0);
     const [parentCommentId,setParentCommentId] = useState(0);
     const [commentState,setCommentState] = useState(comment);
-    const [repliesState,setRepliesState] = useState(replies);
-
+    const [repliesState,setRepliesState] = useState([]);
+    
     const {openModal,closeModal} = useModalStore();
     const {openReportModal} = useReportModalStore();
 
@@ -34,19 +35,28 @@ export default function PostComment({idx,comment,articleId,currentUser}){
             })
             
             if(res.data.status==="SUCCESS"){
-                initShowReplies(res.data.data.commentDTOList.length);
-                setCommentsAndRecomments(res.data.data.commentDTOList);
+              setReplies(res.data.data.reCommentDTOList);
                 setRecomment("");
-                const replies = res.data.data.commentDTOList.filter(c=>c.parentCommentId === comment.id);
-                setRepliesState(replies);
+                setRepliesState(res.data.data.reCommentDTOList);
                 
             }
 
     }
 
+    const unLoginedAction = ()=>{
+      if(!isLogined){
+          openModal("로그인 후 이용할 수 있습니다.")
+      return false;
+      }else{
+        return true;
+      }
+    }
+
 const likeClick = async (id)=>{
+  
     const res = await api.post("/api/v1/comment/increase-like",{
-        commentId:id
+      likeTopic:'COMMENT',
+        id:id
     });
     if(res.data.status==="SUCCESS"){
         
@@ -58,8 +68,11 @@ const likeClick = async (id)=>{
     }
   }
     const unLikeClick = async (id)=>{
+      if(!unLoginedAction())
+      return;
     const res = await api.post("/api/v1/comment/decrease-like",{
-        commentId:id
+      likeTopic:'COMMENT',
+        id:id
     });
     if(res.data.status==="SUCCESS"){
         setCommentState(prev=>({
@@ -71,8 +84,10 @@ const likeClick = async (id)=>{
   }
 
   const likeRecommentClick = async (id,idx)=>{
+    
     const res = await api.post("/api/v1/comment/increase-like",{
-        commentId:id
+      likeTopic:'RECOMMENT',
+        id:id
     });
     if(res.data.status==="SUCCESS"){
         setRepliesState((prev)=>
@@ -86,8 +101,10 @@ const likeClick = async (id)=>{
     }
   }
     const unLikeRecommentClick = async (id,idx)=>{
+      
     const res = await api.post("/api/v1/comment/decrease-like",{
-        commentId:id
+      likeTopic:'RECOMMENT',
+        id:id
     });
     if(res.data.status==="SUCCESS"){
         setRepliesState((prev)=>
@@ -102,6 +119,8 @@ const likeClick = async (id)=>{
   }
 
   const reportComment =async (commentId,targetId,content)=>{
+    if(!unLoginedAction())
+      return;
         const res = await api.post("api/v1/comment/report-comment",{
             commentId:commentId,
             targetUserId: targetId,
@@ -116,6 +135,8 @@ const likeClick = async (id)=>{
   }
 
   const deleteComment = async(id)=>{
+    if(!unLoginedAction())
+      return;
     const res = await api.delete(`/api/v1/comment/delete-comment/${id}`);
 
     if(res.data.status==="SUCCESS"){
@@ -126,6 +147,18 @@ const likeClick = async (id)=>{
         }else{
             openModal("권한이 없습니다.")
         }
+  }
+
+  const getReplies = async(id)=>{
+    const res = await api.get(`/api/v1/comment/read-recomments/${id}`,{
+      params:{articleId:articleId}}
+    );
+
+    if(res.data.status==="SUCCESS"){
+
+      setReplies(res.data.data.reCommentDTOList);
+      setRepliesState(res.data.data.reCommentDTOList);
+    }
   }
 
     return(
@@ -164,7 +197,7 @@ const likeClick = async (id)=>{
 
   <div>
     {
-        comment.commenter.id === currentUser.id
+        isLogined && comment.commenter.id === currentUser.id
         ?
         <MoreMenu
     onDelete={() => openModal("삭제하시겠습니까?",{
@@ -181,12 +214,15 @@ const likeClick = async (id)=>{
     :
     <MoreMenu
     
-      onReport={() => openReportModal({
+      onReport={() => {
+        if(!unLoginedAction())
+      return;
+        openReportModal({
         targetId:comment.id,
         id:comment.commenter.id,
         nickname:comment.commenter.nickName,
         profilePic: ImageServe(comment.commenter.profilePic.link)
-      },(content)=>reportComment(comment.id,comment.commenter.id,content))}
+      },(content)=>reportComment(comment.id,comment.commenter.id,content))}}
       onCopyLink={() => {
         navigator.clipboard.writeText(window.location.href);
         openModal("링크가 복사되었습니다.")
@@ -206,7 +242,7 @@ const likeClick = async (id)=>{
             <button
               onClick={() => {
                 setShowReplies(idx);
-                
+                getReplies(comment.id);
                 setMentionCommenter(comment.commenter.id);
             }}
               className="flex items-center gap-[5px] rounded px-2 py-1"
@@ -217,13 +253,23 @@ const likeClick = async (id)=>{
                 width={16}
                 height={16}
               />
-              {replies.length}
+              {comment.recommentCnt}
             </button>
             <button className="flex gap-4 text-[14px] gap-[5px] text-[#7D7D7D]" onClick={()=>{
                 if(commentState.isCurrentUserLiked){
-                    unLikeClick(commentState.id);
+                  if(!unLoginedAction()){
+                    return;
+                  }else{
+                      unLikeClick(commentState.id);
+                  }
+                    
                 }else{
-                    likeClick(commentState.id);
+                  if(!unLoginedAction())
+                      return;
+                    else{
+                        likeClick(commentState.id);
+                    }
+                    
                 }
             }}>
               {commentState.isCurrentUserLiked ? "❤️" :"🤍"}
@@ -236,7 +282,8 @@ const likeClick = async (id)=>{
         {showReplies[idx] && (
         <div>
             <div className="w-full flex flex-col mt-4 max-w-md ml-[27px]">
-            {replies.map((data,idx) => (
+            {
+            replies.map((data,idx) => (
               <div
                 key={data.id}
                 className="border border-[#FF9466] rounded-[20px] px-[12px] py-[19px] w-full mb-[9.2px]"
@@ -247,12 +294,12 @@ const likeClick = async (id)=>{
                     <div className="flex flex-row">
                         <div className="flex gap-[6px]">
                     <Image
-                      src={ImageServe(data.commenter.profilePic.link)}
+                      src={ImageServe(data.recommenter.profilePic.link)}
                       alt="comment profile"
                       width={24}
                       height={24}
                     />
-                    <div>{data.commenter.nickName}</div>
+                    <div>{data.recommenter.nickName}</div>
                   </div>
                   <div className="flex gap-[10px] ml-[24px]">
                     <div>{data.baseTime.createdDate}</div>
@@ -262,7 +309,7 @@ const likeClick = async (id)=>{
                     </div>
                     <div>
                         {
-                            data.commenter.id === currentUser.id
+                            isLogined && data.recommenter.id === currentUser.id
                             ?
                             <MoreMenu
                           
@@ -280,12 +327,20 @@ const likeClick = async (id)=>{
                         <MoreMenu
                           
                           
-                          onReport={() => openReportModal({
+                          onReport={() => {
+                            if(!unLoginedAction()){
+                              return
+                            }else{
+                                openReportModal({
                             targetId:data.id,
-                            id:data.commenter.id,
-                            nickname:data.commenter.nickName,
+                            id:data.recommenter.id,
+                            nickname:data.recommenter.nickName,
                             profilePic:ImageServe(data.commenter.profilePic.link)
-                          },(content)=>reportComment(data.id,data.commenter.id,content))}
+                          },(content)=>reportComment(data.id,data.recommenter.id,content))}
+                            }
+                            
+
+                          }
                           onCopyLink={() => {
                             navigator.clipboard.writeText(window.location.href);
                             openModal("링크가 복사되었습니다.")
@@ -307,9 +362,19 @@ const likeClick = async (id)=>{
                 <div className="flex gap-4 text-[14px] text-[#7D7D7D] mt-2 gap-[20px]">
                   <button className="flex gap-4 text-[14px] gap-[5px] text-[#7D7D7D]" onClick={()=>{
                 if(repliesState[idx].isCurrentUserLiked){
-                    unLikeRecommentClick(repliesState[idx].id,idx);
+                  if(!unLoginedAction())
+                      return;
+                    else{
+                        unLikeRecommentClick(repliesState[idx].id,idx);
+                    }
+                    
                 }else{
-                    likeRecommentClick(repliesState[idx].id,idx);
+                    if(!unLoginedAction())
+                      return;
+                    else{
+                        likeRecommentClick(repliesState[idx].id,idx);
+                    }
+                    
                 }
                   }}>
                     

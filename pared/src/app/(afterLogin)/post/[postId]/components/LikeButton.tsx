@@ -11,9 +11,13 @@ export default function LikeButton({ initialLiked = false, onToggle }: LikeButto
   const [liked, setLiked] = useState(initialLiked);
 
   const handleClick = () => {
+    
     const newValue = !liked;
-    setLiked(newValue);
-    onToggle?.(newValue);
+    if(onToggle?.(newValue)){
+        setLiked(newValue);
+    }
+    
+    
   };
 
   return (

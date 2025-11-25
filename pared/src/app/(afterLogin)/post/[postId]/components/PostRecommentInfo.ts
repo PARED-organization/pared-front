@@ -40,8 +40,7 @@ interface PostRecommentInfo {
   setLikeCnt: (likeCnt: number) => void;
   setShowReplies: (index: number) => void;
   initShowReplies: (count: number) => void;
-
-  setCommentsAndRecomments: (list: CommentDTO[]) => void;
+    setComments:(added:CommentDTO[])=>void;
 }
 
 export const usePostRecommentInfo = create<PostRecommentInfo>((set, get) => ({
@@ -52,7 +51,10 @@ export const usePostRecommentInfo = create<PostRecommentInfo>((set, get) => ({
   recomments: {},
     setWriteComment: (writeComment:string)=>set({writeComment:writeComment}),
   setLikeCnt: (likeCnt) => set({ likeCnt }),
-
+     setComments: (added) =>
+    set((state) => ({
+      comments: [...state.comments, ...added],
+    })),
   setShowReplies: (index) =>
     set((state) => {
       const newItems = [...state.showReplies];
@@ -65,30 +67,6 @@ export const usePostRecommentInfo = create<PostRecommentInfo>((set, get) => ({
       showReplies: Array(count).fill(false),
     })),
 
-  /** ------------------------------
-   * 전체 댓글 리스트를 넣으면
-   * 부모 댓글 / 대댓글 자동 분리
-   * ------------------------------ */
-  setCommentsAndRecomments: (list: CommentDTO[]) =>
-    set(() => {
-      const parentComments: CommentDTO[] = [];
-      const childComments: Record<number, CommentDTO[]> = {};
 
-      list.forEach((c) => {
-        if (c.parentCommentId === null) {
-          parentComments.push(c);
-        } else {
-          if (!childComments[c.parentCommentId]) {
-            childComments[c.parentCommentId] = [];
-          }
-          childComments[c.parentCommentId].push(c);
-        }
-      });
-      console.log(childComments);
-      return {
-        comments: parentComments,
-        recomments: childComments,
-        showReplies: Array(parentComments.length).fill(false), // 부모댓글 수만큼 UI 초기화
-      };
-    }),
+    
 }));
